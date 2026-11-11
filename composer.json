@@ -1,0 +1,15 @@
+{
+    "name": "admin/eletivaiii",
+    "autoload": {
+        "psr-4": {
+            "Admin\\Eletivaiii\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "M4theus1",
+            "email": "matheus.silva.alves2909@gmail.com"
+        }
+    ],
+    "require": {}
+}
