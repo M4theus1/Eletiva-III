@@ -13,8 +13,6 @@ return new class extends Migration
             Schema::table('products', fn (Blueprint $table) => $table->softDeletes());
         }
 
-        // Both the old enum (entrada/saida) and the local varchar (entry/exit)
-        // must accept the canonical values before any records are converted.
         Schema::table('stock_movements', fn (Blueprint $table) => $table->string('type', 7)->change());
         DB::table('stock_movements')->where('type', 'entrada')->update(['type' => 'entry']);
         DB::table('stock_movements')->where('type', 'saida')->update(['type' => 'exit']);
@@ -27,9 +25,5 @@ return new class extends Migration
         }
     }
 
-    public function down(): void
-    {
-        // Forward-only compatibility migration: these columns and records may
-        // predate this merge. Never drop them or reinterpret historical data.
-    }
+    public function down(): void {}
 };

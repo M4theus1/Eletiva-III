@@ -11,40 +11,59 @@ use InvalidArgumentException;
 
 class StockService
 {
-    public function move(Product $product, User $user, string $type, int $quantity, ?string $notes = null): StockMovement
+    public function move(Product $product, User $user, string $type, int $quantity, ?string $notes = null)
     {
-        if (! in_array($type, [StockMovement::ENTRY, StockMovement::EXIT], true) || $quantity < 1 || $quantity > 2147483647) {
+        if ($type !== StockMovement::ENTRY && $type !== StockMovement::EXIT) {
+            throw new InvalidArgumentException('Movimentacao invalida.');
+        }
+
+        if ($quantity < 1 || $quantity > 2147483647) {
             throw new InvalidArgumentException('Movimentacao invalida.');
         }
 
         return DB::transaction(function () use ($product, $user, $type, $quantity, $notes) {
-            // The conditional UPDATE checks and changes the balance in one database operation.
-            // Keeping the movement in the same transaction also rolls back stock if its insert fails.
-            $query = Product::query()->whereKey($product->id);
-            $changed = $type === StockMovement::ENTRY
-                ? $query->where('quantity', '<=', 2147483647 - $quantity)->increment('quantity', $quantity)
-                : $query->where('quantity', '>=', $quantity)->decrement('quantity', $quantity);
+            $query = Product::where('id', $product->id);
+
+            if ($type === StockMovement::ENTRY) {
+                $maximumStock = 2147483647;
+                $changed = $query->where('quantity', '<=', $maximumStock - $quantity)
+                    ->increment('quantity', $quantity);
+
+                $errorMessage = 'A entrada excede o limite de estoque permitido.';
+            } else {
+                $changed = $query->where('quantity', '>=', $quantity)
+                    ->decrement('quantity', $quantity);
+
+                $errorMessage = 'Estoque insuficiente para esta saida.';
+            }
 
             if ($changed !== 1) {
-                Product::query()->findOrFail($product->id);
+                Product::findOrFail($product->id);
 
                 throw ValidationException::withMessages([
-                    'quantity' => $type === StockMovement::ENTRY
-                        ? 'A entrada excede o limite de estoque permitido.'
-                        : 'Estoque insuficiente para esta saida.',
+                    'quantity' => $errorMessage,
                 ]);
             }
 
             $product->refresh();
+            $quantityAfter = $product->quantity;
 
-            return $product->movements()->create([
+            if ($type === StockMovement::ENTRY) {
+                $quantityBefore = $quantityAfter - $quantity;
+            } else {
+                $quantityBefore = $quantityAfter + $quantity;
+            }
+
+            $movement = $product->movements()->create([
                 'user_id' => $user->id,
                 'type' => $type,
                 'quantity' => $quantity,
-                'quantity_before' => $type === StockMovement::ENTRY ? $product->quantity - $quantity : $product->quantity + $quantity,
-                'quantity_after' => $product->quantity,
+                'quantity_before' => $quantityBefore,
+                'quantity_after' => $quantityAfter,
                 'notes' => $notes,
             ]);
+
+            return $movement;
         }, 3);
     }
 }

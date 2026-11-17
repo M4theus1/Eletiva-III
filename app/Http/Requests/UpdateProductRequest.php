@@ -15,11 +15,11 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'description' => ['sometimes', 'nullable', 'string', 'max:5000'],
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string|max:5000',
             'code' => ['sometimes', 'nullable', 'string', 'max:100', Rule::unique('products', 'code')->ignore($this->route('product'))],
-            'price' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99999999.99', 'decimal:0,2'],
-            'quantity' => ['missing'],
+            'price' => 'sometimes|required|numeric|min:0|max:99999999.99|decimal:0,2',
+            'quantity' => 'missing',
         ];
     }
 

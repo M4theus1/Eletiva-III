@@ -9,46 +9,66 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Services\StockService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index(PaginationRequest $request): AnonymousResourceCollection
+    public function index(PaginationRequest $request)
     {
-        return ProductResource::collection(Product::orderBy('id')->paginate($request->integer('per_page', 15)));
+        $perPage = $request->integer('per_page', 15);
+        $products = Product::orderBy('id')->paginate($perPage);
+
+        return ProductResource::collection($products);
     }
 
-    public function store(StoreProductRequest $request, StockService $stock): JsonResponse
+    public function store(StoreProductRequest $request, StockService $stock)
     {
-        $product = DB::transaction(function () use ($request, $stock) {
-            $product = Product::create($request->safe()->except('quantity'));
+        $data = $request->validated();
+        $quantity = $request->integer('quantity', 0);
+
+        $product = DB::transaction(function () use ($data, $quantity, $request, $stock) {
+            $product = new Product;
+            $product->name = $data['name'];
+            $product->description = $data['description'] ?? null;
+            $product->code = $data['code'] ?? null;
+            $product->price = $data['price'];
+            $product->save();
+
             $product->refresh();
 
-            if ($request->integer('quantity') > 0) {
-                $stock->move($product, $request->user(), StockMovement::ENTRY, $request->integer('quantity'), 'Estoque inicial');
+            if ($quantity > 0) {
+                $stock->move(
+                    $product,
+                    $request->user(),
+                    StockMovement::ENTRY,
+                    $quantity,
+                    'Estoque inicial'
+                );
             }
 
             return $product;
         });
 
-        return (new ProductResource($product))->response()->setStatusCode(201);
+        $response = new ProductResource($product);
+
+        return $response->response()->setStatusCode(201);
     }
 
-    public function show(Product $product): ProductResource
+    public function show(Product $product)
     {
         return new ProductResource($product);
     }
 
-    public function update(UpdateProductRequest $request, Product $product): ProductResource
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->validated());
+        $data = $request->validated();
+        $product->update($data);
+        $product->refresh();
 
-        return new ProductResource($product->refresh());
+        return new ProductResource($product);
     }
 
-    public function destroy(Product $product): JsonResponse
+    public function destroy(Product $product)
     {
         $product->delete();
 

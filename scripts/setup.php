@@ -3,7 +3,6 @@
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 
-// Local setup: preserve an existing environment/key and never recreate existing tables.
 $root = dirname(__DIR__);
 chdir($root);
 

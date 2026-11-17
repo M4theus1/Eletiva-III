@@ -9,43 +9,55 @@ use App\Http\Resources\StockResource;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Services\StockService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class StockController extends Controller
 {
-    public function show(Product $product): StockResource
+    public function show(Product $product)
     {
         return new StockResource($product);
     }
 
-    public function index(PaginationRequest $request, Product $product): AnonymousResourceCollection
+    public function index(PaginationRequest $request, Product $product)
     {
-        return StockMovementResource::collection(
-            $product->movements()->orderByDesc('id')->paginate($request->integer('per_page', 15))
-        );
+        $perPage = $request->integer('per_page', 15);
+        $movements = $product->movements()->orderByDesc('id')->paginate($perPage);
+
+        return StockMovementResource::collection($movements);
     }
 
-    public function entry(StockMovementRequest $request, Product $product, StockService $stock): JsonResponse
+    public function entry(StockMovementRequest $request, Product $product, StockService $stock)
     {
-        return $this->move($request, $product, $stock, StockMovement::ENTRY);
-    }
+        $quantity = $request->integer('quantity');
+        $notes = $request->validated('notes');
 
-    public function exit(StockMovementRequest $request, Product $product, StockService $stock): JsonResponse
-    {
-        return $this->move($request, $product, $stock, StockMovement::EXIT);
-    }
-
-    private function move(StockMovementRequest $request, Product $product, StockService $stock, string $type): JsonResponse
-    {
         $movement = $stock->move(
             $product,
             $request->user(),
-            $type,
-            $request->integer('quantity'),
-            $request->validated('notes')
+            StockMovement::ENTRY,
+            $quantity,
+            $notes
         );
 
-        return (new StockMovementResource($movement))->response()->setStatusCode(201);
+        $response = new StockMovementResource($movement);
+
+        return $response->response()->setStatusCode(201);
+    }
+
+    public function exit(StockMovementRequest $request, Product $product, StockService $stock)
+    {
+        $quantity = $request->integer('quantity');
+        $notes = $request->validated('notes');
+
+        $movement = $stock->move(
+            $product,
+            $request->user(),
+            StockMovement::EXIT,
+            $quantity,
+            $notes
+        );
+
+        $response = new StockMovementResource($movement);
+
+        return $response->response()->setStatusCode(201);
     }
 }

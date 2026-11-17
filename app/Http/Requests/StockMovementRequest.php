@@ -14,8 +14,8 @@ class StockMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => ['required', 'integer', 'min:1', 'max:2147483647'],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            'quantity' => 'required|integer|min:1|max:2147483647',
+            'notes' => 'nullable|string|max:1000',
         ];
     }
 }

@@ -1,6 +1,3 @@
-// Execute na aba Tests de GET http://127.0.0.1:8000/.
-// Testes locais: cria dados ficticios, exclui o produto criado e revoga seus tokens.
-// Nao requer conta Postman. Aguarde um minuto entre repeticoes frequentes.
 const variables = {
   base_url: "http://127.0.0.1:8000",
   email: "postman.ui." + Date.now() + "." + Math.floor(Math.random()*100000) + "@example.com",

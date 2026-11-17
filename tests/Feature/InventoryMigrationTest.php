@@ -61,7 +61,6 @@ class InventoryMigrationTest extends TestCase
         $this->assertSame(7, $movement->quantity_before);
         $this->assertSame(5, $movement->quantity_after);
 
-        // Rolling back the bridge must not remove columns belonging to older schemas.
         $this->artisan('migrate:rollback', ['--step' => 1, '--force' => true])->assertSuccessful();
         $this->artisan('migrate', ['--force' => true])->assertSuccessful();
         $this->assertSame(5, $product->fresh()->quantity);
