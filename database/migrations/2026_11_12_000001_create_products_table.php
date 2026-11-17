@@ -1,27 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('code', 100)->nullable()->unique();
-            $table->decimal('price', 10, 2);
-            $table->unsignedInteger('quantity')->default(0);
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Historical migration name retained for databases created before the merge.
+        // Creation is now owned by 2026_11_11_233928_create_products_table.
+        // Existing schemas are reconciled by 2026_11_17_000001.
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        // The earlier creation migration owns the table.
     }
 };

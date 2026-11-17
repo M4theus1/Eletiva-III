@@ -2,7 +2,7 @@
 
 Implementação local concluída em 11/11/2026, na branch develop, em C:\dev\Projetos\Eletiva-III.
 
-Parecer: os requisitos funcionais e técnicos do Projeto 03 foram implementados e validados no ambiente local com SQLite. Esta conclusão substitui o parecer de incompletude referente ao commit original 58c68e2. As alterações ainda não foram publicadas no GitHub.
+Parecer: os requisitos funcionais e técnicos do Projeto 03 foram implementados e validados no ambiente local com SQLite. Esta conclusão substitui o parecer de incompletude referente ao commit original 58c68e2. A integração com os commits remotos foi validada em 17/11/2026.
 
 ## Requisitos funcionais
 
@@ -47,8 +47,8 @@ Parecer: os requisitos funcionais e técnicos do Projeto 03 foram implementados 
 ## Validação executada
 
 - Composer: configuração válida e dependências do lock instaladas.
-- Seis migrations aplicadas com sucesso no banco SQLite local.
-- composer test: **47 testes aprovados e 281 asserções**.
+- Migrations das duas branches e compatibilidade aplicadas com sucesso no banco SQLite local.
+- composer test: **49 testes aprovados e 313 asserções**.
 - composer run lint: **aprovado** pelo Laravel Pint.
 - git diff --check: sem erros.
 - Coleção executada com Newman por HTTP real: **24 requisições, 54 asserções, zero falhas**.
@@ -58,7 +58,7 @@ Parecer: os requisitos funcionais e técnicos do Projeto 03 foram implementados 
 - Teste com duas instâncias desatualizadas confirmou que a segunda saída não consegue consumir estoque já utilizado.
 - Erros 401, 404, 405 e 422 foram verificados como JSON, inclusive com Accept não JSON.
 
-Os 47 testes incluem os dois testes de exemplo existentes. A coleção valida o fluxo completo adicionalmente pela rede local. Não foi realizado teste de carga concorrente nem validação em MySQL ou ambiente de produção.
+Os 49 testes incluem os dois testes de exemplo existentes e dois cenários de atualização de bancos anteriores. A coleção valida o fluxo completo adicionalmente pela rede local. Não foi realizado teste de carga concorrente nem validação em MySQL ou ambiente de produção.
 
 ## Uso local
 
@@ -82,4 +82,4 @@ Importe a coleção no Postman e execute na ordem indicada. Ela gera um usuário
 - Saldo inicial positivo registra uma entrada; alterações posteriores usam exclusivamente as rotas de movimentação.
 - Quantidades inteiras; sem unidades fracionárias nesta proposta.
 - Nenhuma interface gráfica é necessária.
-- Código entregue localmente na develop. A publicação no GitHub e o merge na main não fazem parte desta entrega local.
+- Entrega na develop, incluindo merge dos commits remotos. A main não foi alterada.

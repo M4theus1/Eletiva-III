@@ -124,6 +124,7 @@ Quantidade inteira positiva; observação opcional, até 1.000 caracteres. Retor
     "user_id": 1,
     "type": "exit",
     "quantity": 3,
+    "quantity_before": 10,
     "quantity_after": 7,
     "notes": "Venda",
     "created_at": "..."
@@ -199,3 +200,10 @@ Cobre cadastro, hash de senha, login, revogação do token atual, proteção de 
 - Rotas protegidas: `routes/api.php`.
 - Exemplos: `postman/Controle-de-Estoque.postman_collection.json`.
 - Testes funcionais: `tests/Feature/InventoryApiTest.php`.
+## Atualização de instalações anteriores
+
+Após atualizar a branch develop, execute `php artisan migrate`. A integração de 17/11/2026 preserva os bancos criados pelas duas versões anteriores do projeto: mantém produtos e movimentos, acrescenta exclusão lógica quando necessário, normaliza os tipos para `entry`/`exit` e preenche `quantity_before` a partir do histórico existente.
+
+As migrations de criação de 12/11 permanecem como marcadores históricos para bancos que já as executaram. A criação das tabelas é centralizada nas migrations de 11/11; a migration `2026_11_17_000001_reconcile_inventory_schemas` concilia as estruturas. Essa migration de compatibilidade é de avanço: seu rollback não remove campos nem reinterpreta dados históricos. Faça backup antes de atualizar um banco com dados importantes.
+
+A suíte inclui testes de atualização com os schemas originais das duas branches, além dos testes da API. No total: 49 testes e 313 asserções aprovados no SQLite.

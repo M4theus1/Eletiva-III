@@ -1,28 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('stock_movements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->restrictOnDelete();
-            $table->foreignId('user_id')->constrained()->restrictOnDelete();
-            $table->string('type', 5);
-            $table->unsignedInteger('quantity');
-            $table->unsignedInteger('quantity_after');
-            $table->string('notes', 1000)->nullable();
-            $table->timestamps();
-            $table->index(['product_id', 'id']);
-        });
+        // Historical migration name retained for databases created before the merge.
+        // Creation is now owned by 2026_11_11_233934_create_stock_movements_table.
+        // Existing schemas are reconciled by 2026_11_17_000001.
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('stock_movements');
+        // The earlier creation migration owns the table.
     }
 };

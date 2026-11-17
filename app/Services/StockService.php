@@ -41,6 +41,7 @@ class StockService
                 'user_id' => $user->id,
                 'type' => $type,
                 'quantity' => $quantity,
+                'quantity_before' => $type === StockMovement::ENTRY ? $product->quantity - $quantity : $product->quantity + $quantity,
                 'quantity_after' => $product->quantity,
                 'notes' => $notes,
             ]);
